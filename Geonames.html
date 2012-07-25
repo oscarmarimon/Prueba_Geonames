@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Prueba GeoNames WebService</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+function printSelect(jData) {
+  if (jData == null) { 
+    alert('There was a problem parsing search results');
+		return;
+  }
+  var geonames = jData.geonames;
+  if (nextChild < 5 && geonames && geonames.length > 0) {
+		var html = '<option value="">... Select ...</option>';
+		for (i=0;i< geonames.length;i++) {
+			 var name = geonames[i];
+			 nombre = (name.name)? name.name : name.countryName;
+			 html = html + '<option value="' + name.countryCode + '" geonameid="' + name.geonameId + '" fcode="'+ name.fcode +'" fcl="'+ name.fcl +'">' + nombre + '</option>';
+		}
+		$('form ul').append('<li><label>Child'+ nextChild +':</label><select id="Child'+ nextChild +'Select" name="child'+ nextChild +'">'+ html +'</select></li>');
+	} else {
+		$('form ul').append('<li><label>Direccion:</label><input type="text" name="direccion" /></li><li><button type="button" onClick="showAdress()">Enviar</button>');
+	}
+}
+function getChildren(geonameId) {
+	url = (geonameId != '')? 'http://ws.geonames.org/childrenJSON' : 'http://ws.geonames.org/countryInfo';   
+  $.getJSON(url, {type : "JSON", geonameId : geonameId}, function(data) {
+    printSelect(data);
+  });
+}
+
+var nextChild = 0;
+
+$(function() {
+	getChildren('');
+	$("form").on("change", "select", function(event){
+		nextChild = $(this).index('select') + 1;
+		$(this).parent().nextAll('li').remove();
+		$('#address').text('');
+		getChildren($(this).find('option:selected').attr('geonameid'));
+	});
+});
+
+function showAdress() {
+	box = $('form select');
+	countryCode = box.first().val();
+	countryName = box.first().find('option:selected').text();
+	City = box.last().find('option:selected').text();
+	Address = $('form input').val();
+	html = 'You live in: <strong>'+ Address +' - '+ City +' ('+countryName+' - '+countryCode+')</strong>';
+	$('#address').html(html);
+}
+</script>
+</head>
+
+<body>
+<form>
+	<ul>
+  </ul>
+</form>
+<div id="address"></div>
+</body>
+</html>
