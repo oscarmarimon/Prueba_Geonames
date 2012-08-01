@@ -5,12 +5,21 @@
 <title>Prueba GeoNames WebService</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script>
+function SortByNameASC(x,y) {
+	return (
+		(x.name) ? 
+		((x.name == y.name) ? 0 : ((x.name > y.name) ? 1 : -1 )) 
+		: 
+		((x.countryName == y.countryName) ? 0 : ((x.countryName > y.countryName) ? 1 : -1 ))
+	);
+}
 function printSelect(jData) {
   if (jData == null) { 
     alert('There was a problem parsing search results');
 		return;
   }
   var geonames = jData.geonames;
+	geonames.sort(SortByNameASC);
   if (nextChild < 5 && geonames && geonames.length > 0) {
 		var html = '<option value="">... Select ...</option>';
 		for (i=0;i< geonames.length;i++) {
@@ -60,6 +69,5 @@ function showAdress() {
   </ul>
 </form>
 <div id="address"></div>
-Probando.....
 </body>
 </html>
